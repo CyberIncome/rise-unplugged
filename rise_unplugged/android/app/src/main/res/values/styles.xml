@@ -1,0 +1,9 @@
+<resources>
+    <style name="LaunchTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_color</item>
+    </style>
+
+    <style name="NormalTheme" parent="Theme.Material3.DayNight">
+        <item name="android:windowSplashScreenBackground">@color/splash_color</item>
+    </style>
+</resources>
