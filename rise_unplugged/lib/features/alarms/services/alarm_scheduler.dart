@@ -1,0 +1,101 @@
+import 'dart:async';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+import '../models/alarm.dart';
+import '../models/follow_up_alarm.dart';
+
+class AlarmScheduler {
+  AlarmScheduler(this._notifications);
+
+  final FlutterLocalNotificationsPlugin _notifications;
+
+  Future<void> ensureInitialized() async {
+    await _notifications.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(requestSoundPermission: true),
+      ),
+    );
+  }
+
+  Future<void> scheduleAlarm(Alarm alarm) async {
+    await ensureInitialized();
+    await _schedulePrimaryAlarm(alarm);
+    for (final followUp in alarm.followUps) {
+      await _scheduleFollowUp(alarm, followUp);
+    }
+  }
+
+  Future<void> cancelAlarm(Alarm alarm) async {
+    await ensureInitialized();
+    await _notifications.cancel(_primaryId(alarm));
+    for (final followUp in alarm.followUps) {
+      await _notifications.cancel(_followUpId(alarm, followUp));
+    }
+  }
+
+  Future<void> _schedulePrimaryAlarm(Alarm alarm) async {
+    final scheduled = _toTz(alarm.scheduledTime);
+    final missionBody = alarm.mission?.description;
+    await _notifications.zonedSchedule(
+      _primaryId(alarm),
+      alarm.label,
+      missionBody ?? 'Good morning! Your day is ready to begin.',
+      scheduled,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'alarms',
+          'Morning Alarms',
+          channelDescription: 'Smart alarm notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          sound: RawResourceAndroidNotificationSound('sunrise'),
+        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: alarm.id,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  Future<void> _scheduleFollowUp(Alarm alarm, FollowUpAlarm followUp) async {
+    final scheduled = _toTz(alarm.scheduledTime.add(followUp.delay));
+    await _notifications.zonedSchedule(
+      _followUpId(alarm, followUp),
+      followUp.message,
+      followUp.recommendation ??
+          'Take a stretch and hydrate to shake off sleep inertia.',
+      scheduled,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'follow_ups',
+          'Follow-up Alarms',
+          channelDescription: 'Gentle nudges after the main alarm',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: alarm.id,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  int _primaryId(Alarm alarm) => alarm.id.hashCode;
+
+  int _followUpId(Alarm alarm, FollowUpAlarm followUp) =>
+      Object.hash(alarm.id, followUp.delay.inMinutes, followUp.message);
+
+  tz.TZDateTime _toTz(DateTime dateTime) {
+    final location = tz.local;
+    return tz.TZDateTime.from(dateTime, location);
+  }
+}
