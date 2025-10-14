@@ -18,6 +18,76 @@ rise_unplugged/
 └── test/                 # Placeholder widget tests
 ```
 
+## Step-by-step setup
+
+The guide below assumes you are starting from scratch on macOS, Windows, or Linux. Follow each step in order—everything happens inside the `rise_unplugged/` directory unless otherwise noted.
+
+### 1. Install required tools
+
+1. [Install Git](https://git-scm.com/downloads) so you can clone the repository.
+2. [Install Flutter 3.13 or newer](https://docs.flutter.dev/get-started/install). During installation Flutter will also download the matching Dart SDK.
+3. Add Flutter to your shell `PATH`:
+   - macOS/Linux: `export PATH="/path/to/flutter/bin:$PATH"` (add to `~/.zshrc` or `~/.bashrc` for persistence).
+   - Windows: Open **Start → "Edit the system environment variables"** → **Environment Variables** and append `C:\path\to\flutter\bin` to the `Path` entry under *System variables*.
+4. Install a code editor/IDE with Flutter support (Android Studio, IntelliJ IDEA, or VS Code with the Flutter extension).
+5. Install platform toolchains if you plan to run on:
+   - **Android**: Android Studio (SDK + Emulator) and enable USB debugging for physical devices.
+   - **iOS** (macOS only): Xcode with the iOS Simulator and an Apple Developer account for device provisioning.
+
+### 2. Clone the project
+
+```bash
+git clone https://github.com/<your-org-or-user>/rise-unplugged.git
+cd rise-unplugged/rise_unplugged
+```
+
+### 3. Validate your Flutter environment
+
+Run the following command inside the `rise_unplugged/` directory:
+
+```bash
+flutter doctor
+```
+
+Resolve any issues the tool reports (e.g., missing Android licenses or iOS signing). Continue when everything shows a green checkmark or an actionable message you understand.
+
+### 4. Fetch dependencies and generate platform files
+
+```bash
+flutter pub get
+```
+
+This downloads every Dart/Flutter package used by the app and updates generated metadata.
+
+### 5. Configure local assets (optional but recommended)
+
+Replace the default launcher icons and splash assets found under `android/app/src/main/res/` and `ios/Runner/Assets.xcassets/` before publishing. You can use [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons) to automate this if desired.
+
+### 6. Run the application
+
+1. Connect a device or start an emulator/simulator.
+2. From the `rise_unplugged/` directory run:
+
+   ```bash
+   flutter run
+   ```
+
+3. Select your target device from the prompted list. The app launches with onboarding, smart alarms, sleep debt analytics, and the unplug timer experience ready to explore.
+
+### 7. Execute automated checks
+
+Run these commands before committing or publishing changes:
+
+```bash
+flutter analyze
+flutter test
+```
+
+Both should complete without errors. The analyze step enforces lint rules; the tests verify alarm mission serialization and other flows.
+
+### 8. Explore feature flags and sample data
+
+The Settings screen exposes optional enhancements (AI insights, streaks, exports). Toggle them on to experience feature-flagged functionality. When running on a clean install the project seeds example alarms and unplug preferences so you can see the full experience immediately.
 ## Getting Started
 
 1. Install Flutter 3.13 or newer and run `flutter pub get` from the `rise_unplugged/` directory.
