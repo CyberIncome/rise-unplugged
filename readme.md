@@ -88,6 +88,12 @@ Both should complete without errors. The analyze step enforces lint rules; the t
 ### 8. Explore feature flags and sample data
 
 The Settings screen exposes optional enhancements (AI insights, streaks, exports). Toggle them on to experience feature-flagged functionality. When running on a clean install the project seeds example alarms and unplug preferences so you can see the full experience immediately.
+## Getting Started
+
+1. Install Flutter 3.13 or newer and run `flutter pub get` from the `rise_unplugged/` directory.
+2. Update the placeholder Android and iOS launcher assets before publishing.
+3. Use `flutter run` targeting Android or iOS simulators to explore the onboarding, alarm dashboard, sleep debt charts, and unplug timer.
+4. Optional integrations like AI insights, streaks, and data exports are controlled through feature flags in the Settings screen.
 
 The project is intentionally modular so feature teams can iterate on alarms, sleep debt analytics, or unplug experiences independently.
 
