@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../services/health/health_integration_service.dart';
 import '../../alarms/models/alarm.dart';
+import '../models/sleep_persona.dart';
 import '../models/sleep_session.dart';
 import '../services/sleep_debt_repository.dart';
 
@@ -15,24 +16,32 @@ class SleepDebtState {
     required this.sessions,
     required this.weeklyDebt,
     required this.goalPerNight,
+    this.persona,
+    this.weeklyDigestEnabled = false,
     this.tooltipsSeen = const {},
   });
 
   final List<SleepSession> sessions;
   final Map<DateTime, Duration> weeklyDebt;
   final Duration goalPerNight;
+  final SleepPersona? persona;
+  final bool weeklyDigestEnabled;
   final Set<String> tooltipsSeen;
 
   SleepDebtState copyWith({
     List<SleepSession>? sessions,
     Map<DateTime, Duration>? weeklyDebt,
     Duration? goalPerNight,
+    SleepPersona? persona,
+    bool? weeklyDigestEnabled,
     Set<String>? tooltipsSeen,
   }) {
     return SleepDebtState(
       sessions: sessions ?? this.sessions,
       weeklyDebt: weeklyDebt ?? this.weeklyDebt,
       goalPerNight: goalPerNight ?? this.goalPerNight,
+      persona: persona ?? this.persona,
+      weeklyDigestEnabled: weeklyDigestEnabled ?? this.weeklyDigestEnabled,
       tooltipsSeen: tooltipsSeen ?? this.tooltipsSeen,
     );
   }
@@ -57,15 +66,33 @@ class SleepDebtNotifier extends Notifier<SleepDebtState> {
       sessions: [],
       weeklyDebt: {},
       goalPerNight: Duration(hours: 8),
+      persona: null,
+      weeklyDigestEnabled: false,
     );
   }
 
   Future<void> _load() async {
-    final repository = await ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await _getRepository();
+    if (repository == null) {
+      return;
+    }
     final sessions = await repository.loadSessions();
+    if (!ref.mounted) return;
     final goal = await repository.loadGoal(const Duration(hours: 8));
+    if (!ref.mounted) return;
     final tooltips = await repository.loadTooltips();
-    _recalculateState(sessions, goalPerNight: goal, tooltipsSeen: tooltips);
+    if (!ref.mounted) return;
+    final persona = await repository.loadPersona();
+    if (!ref.mounted) return;
+    final weeklyDigest = await repository.loadWeeklyDigestEnabled(false);
+    if (!ref.mounted) return;
+    _recalculateState(
+      sessions,
+      goalPerNight: goal,
+      tooltipsSeen: tooltips,
+      persona: persona,
+      weeklyDigestEnabled: weeklyDigest,
+    );
   }
 
   Future<void> addSession(SleepSession session) async {
@@ -126,7 +153,12 @@ class SleepDebtNotifier extends Notifier<SleepDebtState> {
     List<SleepSession> sessions, {
     Duration? goalPerNight,
     Set<String>? tooltipsSeen,
+    SleepPersona? persona,
+    bool? weeklyDigestEnabled,
   }) {
+    if (!ref.mounted) {
+      return;
+    }
     final goal = goalPerNight ?? state.goalPerNight;
     final sortedSessions = [...sessions]
       ..sort((a, b) => a.start.compareTo(b.start));
@@ -152,22 +184,49 @@ class SleepDebtNotifier extends Notifier<SleepDebtState> {
       sessions: sortedSessions,
       weeklyDebt: weeklyDebt,
       goalPerNight: goal,
+      persona: persona ?? state.persona,
+      weeklyDigestEnabled: weeklyDigestEnabled ?? state.weeklyDigestEnabled,
       tooltipsSeen: tooltipsSeen ?? state.tooltipsSeen,
     );
   }
 
   Future<void> _persistSessions() async {
-    final repository = await ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await _getRepository();
+    if (repository == null || !ref.mounted) return;
     await repository.saveSessions(state.sessions);
   }
 
   Future<void> _persistGoal() async {
-    final repository = await ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await _getRepository();
+    if (repository == null || !ref.mounted) return;
     await repository.saveGoal(state.goalPerNight);
   }
 
   Future<void> _persistTooltips() async {
-    final repository = await ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await _getRepository();
+    if (repository == null || !ref.mounted) return;
     await repository.saveTooltips(state.tooltipsSeen);
+  }
+
+  Future<void> setPersona(SleepPersona persona) async {
+    final updated = persona.copyWith(lastUpdated: DateTime.now());
+    state = state.copyWith(persona: updated);
+    final repository = await _getRepository();
+    if (repository == null || !ref.mounted) return;
+    await repository.savePersona(updated);
+  }
+
+  Future<void> setWeeklyDigestEnabled(bool enabled) async {
+    state = state.copyWith(weeklyDigestEnabled: enabled);
+    final repository = await _getRepository();
+    if (repository == null || !ref.mounted) return;
+    await repository.saveWeeklyDigestEnabled(enabled);
+  }
+
+  Future<SleepDebtRepository?> _getRepository() async {
+    if (!ref.mounted) return null;
+    final repository = await ref.read(sleepDebtRepositoryProvider.future);
+    if (!ref.mounted) return null;
+    return repository;
   }
 }

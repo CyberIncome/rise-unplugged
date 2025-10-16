@@ -6,6 +6,8 @@ import '../models/alarm_mission.dart';
 import '../providers/alarm_schedule_provider.dart';
 import 'alarm_editor_sheet.dart';
 import '../../settings/settings_screen.dart';
+import '../../sleep_debt/providers/sleep_debt_provider.dart';
+import '../services/rem_cycle_service.dart';
 
 class AlarmDashboard extends ConsumerWidget {
   const AlarmDashboard({super.key});
@@ -13,6 +15,7 @@ class AlarmDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final alarms = ref.watch(alarmScheduleProvider);
+    final sleepDebt = ref.watch(sleepDebtProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -49,20 +52,36 @@ class AlarmDashboard extends ConsumerWidget {
               },
             );
           }
-          return ListView.builder(
-            padding: const EdgeInsets.only(bottom: 88),
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              final alarm = data[index];
-              return _AlarmTile(
-                alarm: alarm,
-                onEdit: (updated) async {
-                  await ref
-                      .read(alarmScheduleProvider.notifier)
-                      .updateAlarm(updated);
-                },
-              );
-            },
+          final insight = _computeInsight(data, sleepDebt);
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 96, top: 8),
+            children: [
+              if (insight != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _RemInsightCard(
+                    insight: insight,
+                    onApplySmartWindow: insight.smartWindow != null
+                        ? () => ref
+                            .read(alarmScheduleProvider.notifier)
+                            .applyRemSuggestion(
+                              insight.alarm,
+                              insight.recommendedBedtime,
+                            )
+                        : null,
+                  ),
+                ),
+              if (insight != null) const SizedBox(height: 12),
+              for (final alarm in data)
+                _AlarmTile(
+                  alarm: alarm,
+                  onEdit: (updated) async {
+                    await ref
+                        .read(alarmScheduleProvider.notifier)
+                        .updateAlarm(updated);
+                  },
+                ),
+            ],
           );
         },
         error: (error, stackTrace) => Center(child: Text('Error: $error')),
@@ -207,6 +226,161 @@ class _AlarmTile extends ConsumerWidget {
 }
 
 enum _AlarmAction { edit, rem, delete }
+
+class _AlarmInsight {
+  const _AlarmInsight({
+    required this.alarm,
+    required this.recommendedBedtime,
+    required this.goalPerNight,
+    required this.smartWindow,
+    required this.cycleAnchors,
+    required this.todaysDebt,
+  });
+
+  final Alarm alarm;
+  final DateTime recommendedBedtime;
+  final Duration goalPerNight;
+  final Duration? smartWindow;
+  final List<DateTime> cycleAnchors;
+  final Duration todaysDebt;
+}
+
+_AlarmInsight? _computeInsight(
+  List<Alarm> alarms,
+  SleepDebtState sleepDebt,
+) {
+  final enabled = alarms.where((alarm) => alarm.enabled).toList();
+  if (enabled.isEmpty) {
+    return null;
+  }
+  enabled.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
+  final upcoming = enabled.first;
+  final goal = sleepDebt.goalPerNight;
+  final recommendedBedtime = upcoming.scheduledTime.subtract(goal);
+  final remService = const RemCycleService();
+  final anchors = remService
+      .recommendedWakeTimes(targetWake: upcoming.scheduledTime, cycles: 4);
+  final displayedAnchors = anchors.reversed.take(3).toList().reversed.toList();
+  final smartWindow =
+      remService.bestSmartWindow(recommendedBedtime, upcoming.scheduledTime);
+  final today = DateTime.now();
+  final todayKey = DateTime(today.year, today.month, today.day);
+  final todaysDebt = sleepDebt.weeklyDebt[todayKey] ?? Duration.zero;
+  return _AlarmInsight(
+    alarm: upcoming,
+    recommendedBedtime: recommendedBedtime,
+    goalPerNight: goal,
+    smartWindow: smartWindow,
+    cycleAnchors: displayedAnchors,
+    todaysDebt: todaysDebt,
+  );
+}
+
+class _RemInsightCard extends StatelessWidget {
+  const _RemInsightCard({
+    required this.insight,
+    this.onApplySmartWindow,
+  });
+
+  final _AlarmInsight insight;
+  final VoidCallback? onApplySmartWindow;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final localizations = MaterialLocalizations.of(context);
+    final bedtimeLabel = localizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(insight.recommendedBedtime),
+    );
+    final wakeLabel = localizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(insight.alarm.scheduledTime),
+    );
+    final cycleLabels = insight.cycleAnchors
+        .map((anchor) => localizations.formatTimeOfDay(
+              TimeOfDay.fromDateTime(anchor),
+            ))
+        .toList();
+    final alarmLabel = insight.alarm.label.isEmpty
+        ? 'your alarm'
+        : '"${insight.alarm.label}"';
+    final debtText = insight.todaysDebt > Duration.zero
+        ? 'Sleep debt today: ${_formatDuration(insight.todaysDebt)} to recover.'
+        : 'You are on track with your sleep goal today.';
+    final smartWindowText = insight.smartWindow != null
+        ? 'Suggested smart window: ${insight.smartWindow!.inMinutes} minutes.'
+        : 'Log at least three full cycles tonight to unlock a smart window recommendation.';
+
+    return Card(
+      color: theme.colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Tonight's wind-down plan",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Aim to wind down by $bedtimeLabel for '
+              '${_formatDuration(insight.goalPerNight)} of rest before '
+              '$alarmLabel rings at $wakeLabel.',
+            ),
+            const SizedBox(height: 8),
+            Text(debtText),
+            const SizedBox(height: 12),
+            if (cycleLabels.isNotEmpty) ...[
+              const Text('Cycle-friendly anchors'),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final label in cycleLabels)
+                    Chip(
+                      avatar: const Icon(Icons.nightlight_round, size: 16),
+                      label: Text(label),
+                    ),
+                  if (insight.smartWindow != null)
+                    Chip(
+                      avatar: const Icon(Icons.timelapse, size: 16),
+                      label:
+                          Text('${insight.smartWindow!.inMinutes} min window'),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
+            Text(smartWindowText),
+            if (insight.smartWindow != null && onApplySmartWindow != null) ...[
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: onApplySmartWindow,
+                icon: const Icon(Icons.bedtime),
+                label: const Text('Apply smart window'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _formatDuration(Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
+  if (hours > 0 && minutes > 0) {
+    return '${hours}h ${minutes}m';
+  }
+  if (hours > 0) {
+    return '${hours}h';
+  }
+  return '${minutes}m';
+}
 
 class _EmptyAlarmsState extends StatelessWidget {
   const _EmptyAlarmsState({required this.onCreate});
