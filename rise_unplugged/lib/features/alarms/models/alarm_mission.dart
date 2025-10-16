@@ -1,6 +1,16 @@
 import 'package:flutter/foundation.dart';
 
-enum AlarmMissionType { breathwork, mathQuiz, focusTap }
+enum AlarmMissionType {
+  breathwork,
+  mathQuiz,
+  focusTap,
+  affirmation,
+  barcodeScan,
+  photoProof,
+  stepCounter,
+  memoryGrid,
+  breathAndAffirm,
+}
 
 enum AlarmMissionDifficulty { gentle, focused, intense }
 
@@ -12,6 +22,7 @@ class AlarmMission {
     required this.name,
     required this.description,
     this.target = 1,
+    this.cues = const <String>[],
   });
 
   final AlarmMissionType type;
@@ -19,6 +30,7 @@ class AlarmMission {
   final String name;
   final String description;
   final int target;
+  final List<String> cues;
 
   String get id => '${type.name}:${difficulty.name}:$target';
 
@@ -28,6 +40,7 @@ class AlarmMission {
     String? name,
     String? description,
     int? target,
+    List<String>? cues,
   }) {
     return AlarmMission(
       type: type ?? this.type,
@@ -35,6 +48,7 @@ class AlarmMission {
       name: name ?? this.name,
       description: description ?? this.description,
       target: target ?? this.target,
+      cues: cues ?? this.cues,
     );
   }
 
@@ -45,6 +59,7 @@ class AlarmMission {
       'name': name,
       'description': description,
       'target': target,
+      'cues': cues,
     };
   }
 
@@ -62,11 +77,16 @@ class AlarmMission {
       description: json['description'] as String? ??
           'Complete a few deep breaths to prove you are awake and grounded.',
       target: json['target'] as int? ?? 3,
+      cues: (json['cues'] as List?)
+              ?.whereType<String>()
+              .toList(growable: false) ??
+          const <String>[],
     );
   }
 
   @override
-  int get hashCode => Object.hash(type, difficulty, name, description, target);
+  int get hashCode =>
+      Object.hash(type, difficulty, name, description, target, Object.hashAll(cues));
 
   @override
   bool operator ==(Object other) {
@@ -76,7 +96,8 @@ class AlarmMission {
         other.difficulty == difficulty &&
         other.name == name &&
         other.description == description &&
-        other.target == target;
+        other.target == target &&
+        listEquals(other.cues, cues);
   }
 }
 

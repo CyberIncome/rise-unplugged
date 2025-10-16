@@ -12,17 +12,22 @@ import '../models/ringtone.dart';
 import '../services/alarm_mission_catalog.dart';
 import '../services/alarm_repository.dart';
 import '../services/alarm_scheduler.dart';
+import '../services/notifications_adapter.dart';
 import '../services/rem_cycle_service.dart';
+import '../../../shared/utils/app_logger.dart';
 import '../../sleep_debt/providers/sleep_debt_provider.dart';
 
 final alarmSchedulerProvider = Provider<AlarmScheduler>((ref) {
   final plugin = FlutterLocalNotificationsPlugin();
-  return AlarmScheduler(plugin);
+  final adapter = FlutterLocalNotificationsAdapter(plugin);
+  final logger = ref.watch(appLoggerProvider);
+  return AlarmScheduler(adapter, logger);
 });
 
 final alarmRepositoryProvider = FutureProvider<AlarmRepository>((ref) async {
   final prefs = await SharedPreferences.getInstance();
-  return AlarmRepository(prefs);
+  final logger = ref.read(appLoggerProvider);
+  return AlarmRepository(prefs, logger);
 });
 
 final alarmScheduleProvider =
@@ -69,10 +74,12 @@ class AlarmScheduleNotifier extends AsyncNotifier<List<Alarm>> {
           FollowUpAlarm(
             delay: Duration(minutes: 10),
             message: 'Time to stretch and shine!',
+            recommendation: 'Stand up, hydrate, and open the blinds.',
           ),
           FollowUpAlarm(
             delay: Duration(minutes: 20),
             message: 'Last call to stay on track!',
+            recommendation: 'Review today\'s intention in the Rise brief.',
           ),
         ],
         mission: AlarmMissionCatalog.defaultMission,
