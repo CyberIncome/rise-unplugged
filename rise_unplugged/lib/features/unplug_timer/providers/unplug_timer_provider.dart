@@ -41,25 +41,24 @@ final unplugTimerRepositoryProvider =
 });
 
 final unplugTimerProvider =
-    StateNotifierProvider<UnplugTimerNotifier, UnplugTimerState>((ref) {
-  return UnplugTimerNotifier(ref);
-});
+    NotifierProvider<UnplugTimerNotifier, UnplugTimerState>(
+  UnplugTimerNotifier.new,
+);
 
-class UnplugTimerNotifier extends StateNotifier<UnplugTimerState> {
-  UnplugTimerNotifier(this._ref)
-      : super(
-          const UnplugTimerState(
-            config: UnplugTimerConfig(duration: Duration(minutes: 10)),
-          ),
-        ) {
-    _load();
-  }
-
-  final Ref _ref;
+class UnplugTimerNotifier extends Notifier<UnplugTimerState> {
   Timer? _timer;
 
+  @override
+  UnplugTimerState build() {
+    unawaited(_load());
+    ref.onDispose(() => _timer?.cancel());
+    return const UnplugTimerState(
+      config: UnplugTimerConfig(duration: Duration(minutes: 10)),
+    );
+  }
+
   Future<void> _load() async {
-    final repository = await _ref.read(unplugTimerRepositoryProvider.future);
+    final repository = await ref.read(unplugTimerRepositoryProvider.future);
     final config = await repository.load();
     state = state.copyWith(config: config);
   }
@@ -96,14 +95,8 @@ class UnplugTimerNotifier extends StateNotifier<UnplugTimerState> {
     state = state.copyWith(isRunning: false, remaining: Duration.zero);
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
   Future<void> _persist(UnplugTimerConfig config) async {
-    final repository = await _ref.read(unplugTimerRepositoryProvider.future);
+    final repository = await ref.read(unplugTimerRepositoryProvider.future);
     await repository.save(config);
   }
 }

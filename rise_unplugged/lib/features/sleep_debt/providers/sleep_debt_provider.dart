@@ -47,26 +47,21 @@ final sleepDebtRepositoryProvider =
 });
 
 final sleepDebtProvider =
-    StateNotifierProvider<SleepDebtNotifier, SleepDebtState>((ref) {
-  return SleepDebtNotifier(ref);
-});
+    NotifierProvider<SleepDebtNotifier, SleepDebtState>(SleepDebtNotifier.new);
 
-class SleepDebtNotifier extends StateNotifier<SleepDebtState> {
-  SleepDebtNotifier(this._ref)
-      : super(
-          const SleepDebtState(
-            sessions: [],
-            weeklyDebt: {},
-            goalPerNight: Duration(hours: 8),
-          ),
-        ) {
-    _load();
+class SleepDebtNotifier extends Notifier<SleepDebtState> {
+  @override
+  SleepDebtState build() {
+    unawaited(_load());
+    return const SleepDebtState(
+      sessions: [],
+      weeklyDebt: {},
+      goalPerNight: Duration(hours: 8),
+    );
   }
 
-  final Ref _ref;
-
   Future<void> _load() async {
-    final repository = await _ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await ref.read(sleepDebtRepositoryProvider.future);
     final sessions = await repository.loadSessions();
     final goal = await repository.loadGoal(const Duration(hours: 8));
     final tooltips = await repository.loadTooltips();
@@ -162,17 +157,17 @@ class SleepDebtNotifier extends StateNotifier<SleepDebtState> {
   }
 
   Future<void> _persistSessions() async {
-    final repository = await _ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await ref.read(sleepDebtRepositoryProvider.future);
     await repository.saveSessions(state.sessions);
   }
 
   Future<void> _persistGoal() async {
-    final repository = await _ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await ref.read(sleepDebtRepositoryProvider.future);
     await repository.saveGoal(state.goalPerNight);
   }
 
   Future<void> _persistTooltips() async {
-    final repository = await _ref.read(sleepDebtRepositoryProvider.future);
+    final repository = await ref.read(sleepDebtRepositoryProvider.future);
     await repository.saveTooltips(state.tooltipsSeen);
   }
 }

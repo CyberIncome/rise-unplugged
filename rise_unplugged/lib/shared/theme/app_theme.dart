@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,30 +22,27 @@ class AppThemeData {
 }
 
 final appThemeProvider =
-    StateNotifierProvider<AppThemeController, AppThemeData>(
-  (ref) => AppThemeController(ref),
-);
+    NotifierProvider<AppThemeController, AppThemeData>(AppThemeController.new);
 
-class AppThemeController extends StateNotifier<AppThemeData> {
-  AppThemeController(this._ref)
-      : super(
-          AppThemeData(
-            lightTheme: FlexThemeData.light(scheme: FlexScheme.flutterDash),
-            darkTheme: FlexThemeData.dark(scheme: FlexScheme.flutterDash),
-            mode: ThemeMode.system,
-          ),
-        ) {
-    _load();
-    _flagsSubscription = _ref.listen<FeatureFlags>(
+class AppThemeController extends Notifier<AppThemeData> {
+  static const _prefKey = 'theme_preference';
+  ProviderSubscription<FeatureFlags>? _flagsSubscription;
+  ThemePreference _preference = ThemePreference.system;
+
+  @override
+  AppThemeData build() {
+    _flagsSubscription ??= ref.listen<FeatureFlags>(
       featureFlagsProvider,
       (_, __) => _updateTheme(),
     );
+    ref.onDispose(() => _flagsSubscription?.close());
+    unawaited(_load());
+    return AppThemeData(
+      lightTheme: FlexThemeData.light(scheme: FlexScheme.flutterDash),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.flutterDash),
+      mode: ThemeMode.system,
+    );
   }
-
-  static const _prefKey = 'theme_preference';
-  final Ref _ref;
-  late final ProviderSubscription<FeatureFlags> _flagsSubscription;
-  ThemePreference _preference = ThemePreference.system;
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -64,7 +63,7 @@ class AppThemeController extends StateNotifier<AppThemeData> {
   }
 
   void _updateTheme() {
-    final flags = _ref.read(featureFlagsProvider);
+    final flags = ref.read(featureFlagsProvider);
     final themeMode = switch (_preference) {
       ThemePreference.dark => ThemeMode.dark,
       ThemePreference.light => ThemeMode.light,
@@ -110,10 +109,4 @@ class AppThemeController extends StateNotifier<AppThemeData> {
           TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
         },
       );
-
-  @override
-  void dispose() {
-    _flagsSubscription.close();
-    super.dispose();
-  }
 }

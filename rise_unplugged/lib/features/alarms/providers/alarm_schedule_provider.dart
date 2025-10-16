@@ -26,33 +26,30 @@ final alarmRepositoryProvider = FutureProvider<AlarmRepository>((ref) async {
 });
 
 final alarmScheduleProvider =
-    StateNotifierProvider<AlarmScheduleNotifier, AsyncValue<List<Alarm>>>(
-  (ref) => AlarmScheduleNotifier(ref),
+    AsyncNotifierProvider<AlarmScheduleNotifier, List<Alarm>>(
+  AlarmScheduleNotifier.new,
 );
 
-class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
-  AlarmScheduleNotifier(this._ref) : super(const AsyncValue.loading()) {
-    _loadInitial();
-  }
+class AlarmScheduleNotifier extends AsyncNotifier<List<Alarm>> {
+  AlarmScheduler get _scheduler => ref.read(alarmSchedulerProvider);
 
-  final Ref _ref;
+  Future<AlarmRepository> get _repository =>
+      ref.read(alarmRepositoryProvider.future);
 
-  Future<void> _loadInitial() async {
-    try {
-      final repository = await _ref.read(alarmRepositoryProvider.future);
-      final stored = await repository.fetchAlarms();
-      state = AsyncValue.data(stored);
-      if (stored.isNotEmpty) {
-        await _rescheduleAll(stored);
-      }
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+  @override
+  Future<List<Alarm>> build() async {
+    final repository = await _repository;
+    final stored = await repository.fetchAlarms();
+    if (stored.isNotEmpty) {
+      await _rescheduleAll(stored);
     }
+    return stored;
   }
 
   Future<void> bootstrap() async {
     try {
-      final repository = await _ref.read(alarmRepositoryProvider.future);
+      state = const AsyncValue.loading();
+      final repository = await _repository;
       final stored = await repository.fetchAlarms();
       if (stored.isNotEmpty) {
         state = AsyncValue.data(stored);
@@ -127,7 +124,7 @@ class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
       alarms[index] = alarm;
       state = AsyncValue.data(alarms);
       await _persist(alarms);
-      await _ref.read(alarmSchedulerProvider).cancelAlarm(previous);
+      await _scheduler.cancelAlarm(previous);
       await _schedule(alarm);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
@@ -140,7 +137,7 @@ class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
         ..removeWhere((element) => element.id == alarm.id);
       state = AsyncValue.data(alarms);
       await _persist(alarms);
-      await _ref.read(alarmSchedulerProvider).cancelAlarm(alarm);
+      await _scheduler.cancelAlarm(alarm);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
@@ -150,7 +147,7 @@ class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
     final updated = alarm.copyWith(enabled: enabled);
     await updateAlarm(updated);
     if (!enabled) {
-      await _ref.read(alarmSchedulerProvider).cancelAlarm(alarm);
+      await _scheduler.cancelAlarm(alarm);
     }
   }
 
@@ -161,20 +158,20 @@ class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
   }
 
   Future<void> _persist(List<Alarm> alarms) async {
-    final repository = await _ref.read(alarmRepositoryProvider.future);
+    final repository = await _repository;
     await repository.saveAlarms(alarms);
   }
 
   Future<void> _schedule(Alarm alarm) async {
     if (!alarm.enabled) return;
-    await _ref.read(alarmSchedulerProvider).scheduleAlarm(alarm);
-    await _ref.read(sleepDebtProvider.notifier).recordUpcomingAlarm(alarm);
+    await _scheduler.scheduleAlarm(alarm);
+    await ref.read(sleepDebtProvider.notifier).recordUpcomingAlarm(alarm);
   }
 
   Future<void> _rescheduleAll(List<Alarm> alarms) async {
     for (final alarm in alarms) {
       if (alarm.enabled) {
-        await _ref.read(alarmSchedulerProvider).scheduleAlarm(alarm);
+        await _scheduler.scheduleAlarm(alarm);
       }
     }
   }
@@ -194,5 +191,5 @@ class AlarmScheduleNotifier extends StateNotifier<AsyncValue<List<Alarm>>> {
     return scheduled;
   }
 
-  List<Alarm> _currentAlarms() => state.value ?? <Alarm>[];
+  List<Alarm> _currentAlarms() => state.value ?? const <Alarm>[];
 }

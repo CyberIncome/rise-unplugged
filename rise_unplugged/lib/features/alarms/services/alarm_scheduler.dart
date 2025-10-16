@@ -57,8 +57,6 @@ class AlarmScheduler {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: alarm.id,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
@@ -83,8 +81,6 @@ class AlarmScheduler {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: alarm.id,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }

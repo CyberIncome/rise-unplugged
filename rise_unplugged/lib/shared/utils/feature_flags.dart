@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -52,16 +53,18 @@ class FeatureFlags {
 }
 
 final featureFlagsProvider =
-    StateNotifierProvider<FeatureFlagsController, FeatureFlags>(
-  (ref) => FeatureFlagsController(),
+    NotifierProvider<FeatureFlagsController, FeatureFlags>(
+  FeatureFlagsController.new,
 );
 
-class FeatureFlagsController extends StateNotifier<FeatureFlags> {
-  FeatureFlagsController() : super(const FeatureFlags()) {
-    _load();
-  }
-
+class FeatureFlagsController extends Notifier<FeatureFlags> {
   static const _storageKey = 'feature_flags';
+
+  @override
+  FeatureFlags build() {
+    unawaited(_load());
+    return const FeatureFlags();
+  }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();

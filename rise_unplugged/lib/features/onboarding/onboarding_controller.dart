@@ -6,24 +6,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _onboardingKey = 'onboarding_complete';
 
 final onboardingControllerProvider =
-    StateNotifierProvider<OnboardingController, AsyncValue<bool>>(
-  (ref) => OnboardingController().._load(),
+    AsyncNotifierProvider<OnboardingController, bool>(
+  OnboardingController.new,
 );
 
-class OnboardingController extends StateNotifier<AsyncValue<bool>> {
-  OnboardingController() : super(const AsyncValue.loading());
-
-  Future<void> _load() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final completed = prefs.getBool(_onboardingKey) ?? false;
-      state = AsyncValue.data(completed);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-    }
+class OnboardingController extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingKey) ?? false;
   }
 
   Future<void> markComplete() async {
+    state = const AsyncValue.loading();
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_onboardingKey, true);
@@ -34,6 +29,7 @@ class OnboardingController extends StateNotifier<AsyncValue<bool>> {
   }
 
   Future<void> reset() async {
+    state = const AsyncValue.loading();
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_onboardingKey);
