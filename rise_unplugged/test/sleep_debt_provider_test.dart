@@ -18,7 +18,7 @@ void main() {
     addTearDown(container.dispose);
     final notifier = container.read(sleepDebtProvider.notifier);
 
-    final persona = SleepPersona(
+    const persona = SleepPersona(
       chronotype: SleepChronotype.nightNavigator,
       challenge: WakeChallenge.quickStarter,
       morningFocus: MorningFocus.energisedStart,

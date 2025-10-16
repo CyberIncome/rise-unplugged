@@ -35,7 +35,7 @@ void main() {
   test('persists persona preferences and weekly digest flag', () async {
     final prefs = await SharedPreferences.getInstance();
     final repository = SleepDebtRepository(prefs);
-    final persona = SleepPersona(
+    const persona = SleepPersona(
       chronotype: SleepChronotype.steadyRiser,
       challenge: WakeChallenge.snoozeProne,
       morningFocus: MorningFocus.calmReset,

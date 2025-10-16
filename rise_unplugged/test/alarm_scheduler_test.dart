@@ -98,6 +98,13 @@ void main() {
     expect(adapter.scheduled, hasLength(4));
     expect(adapter.scheduled.first.id, isNotNull);
     expect(adapter.scheduled.first.payload, equals(alarm.id));
+    final followUpCalls =
+        adapter.scheduled.where((call) => call.id != adapter.scheduled.first.id);
+    expect(followUpCalls, isNotEmpty);
+    for (final call in followUpCalls) {
+      expect(call.matchDateTimeComponents, isNull,
+          reason: 'Follow-up reminders should not repeat daily.');
+    }
   });
 
   test('cancels alarm and follow ups using consistent ids', () async {

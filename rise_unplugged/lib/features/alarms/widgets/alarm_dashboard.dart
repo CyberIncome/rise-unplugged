@@ -333,7 +333,7 @@ class _RemInsightCard extends StatelessWidget {
             Text(debtText),
             const SizedBox(height: 12),
             if (cycleLabels.isNotEmpty) ...[
-              Text('Cycle-friendly anchors'),
+              const Text('Cycle-friendly anchors'),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,

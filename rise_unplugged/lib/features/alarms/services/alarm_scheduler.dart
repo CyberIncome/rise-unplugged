@@ -102,7 +102,7 @@ class AlarmScheduler {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: alarm.id,
-      matchDateTimeComponents: DateTimeComponents.time,
+      matchDateTimeComponents: null,
     );
   }
 

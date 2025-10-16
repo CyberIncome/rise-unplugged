@@ -30,13 +30,13 @@ class SleepDebtExportService {
     final buffer = StringBuffer()
       ..writeln('start,end,duration_minutes,source');
     for (final session in sessions) {
-      final duration = session.duration.inMinutes;
-      buffer.writeln(
-        '${session.start.toIso8601String()},'
-        '${session.end.toIso8601String()},'
-        '$duration,'
-        '${session.source.name}',
-      );
+      final row = [
+        session.start.toIso8601String(),
+        session.end.toIso8601String(),
+        session.duration.inMinutes.toString(),
+        session.source.name,
+      ].join(',');
+      buffer.writeln(row);
     }
     return buffer.toString();
   }

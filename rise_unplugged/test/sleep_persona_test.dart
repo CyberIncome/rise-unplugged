@@ -5,7 +5,7 @@ import 'package:rise_unplugged/features/sleep_debt/models/sleep_persona.dart';
 void main() {
   group('SleepPersona', () {
     test('serialises and deserialises correctly', () {
-      final persona = SleepPersona(
+      const persona = SleepPersona(
         chronotype: SleepChronotype.sunriseSeeker,
         challenge: WakeChallenge.heavySleeper,
         morningFocus: MorningFocus.productivityBoost,

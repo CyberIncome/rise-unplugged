@@ -6,7 +6,7 @@ import 'package:rise_unplugged/features/sleep_debt/services/sleep_debt_export_se
 void main() {
   group('SleepDebtExportService', () {
     test('buildCsv creates a header and session rows', () {
-      final service = SleepDebtExportService();
+      const service = SleepDebtExportService();
       final csv = service.buildCsv([
         SleepSession(
           start: DateTime(2024, 1, 1, 22),
@@ -17,6 +17,11 @@ void main() {
       expect(csv.split('\n').first, 'start,end,duration_minutes,source');
       expect(csv.contains('sleep_session_source'), isFalse);
       expect(csv.contains('manual'), isTrue);
+      final row = csv.split('\n')[1];
+      expect(
+        row,
+        '2024-01-01T22:00:00.000,2024-01-02T06:00:00.000,480,manual',
+      );
     });
 
     test('shareSessions throws when there are no sessions', () async {
