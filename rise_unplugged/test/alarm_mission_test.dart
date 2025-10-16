@@ -15,6 +15,7 @@ void main() {
 
     expect(restored, equals(mission));
     expect(restored.id, equals(mission.id));
+    expect(restored.cues, equals(mission.cues));
   });
 
   test('Alarm persists mission payload in json', () {
@@ -31,5 +32,23 @@ void main() {
     final restored = Alarm.fromJson(alarm.toJson());
     expect(restored.mission, equals(mission));
     expect(restored.mission?.target, equals(mission.target));
+    expect(restored.mission?.cues, equals(mission.cues));
+  });
+
+  test('Catalog returns curated missions per difficulty', () {
+    final gentle = AlarmMissionCatalog.missionsForDifficulty(
+      AlarmMissionDifficulty.gentle,
+    );
+    final focused = AlarmMissionCatalog.missionsForDifficulty(
+      AlarmMissionDifficulty.focused,
+    );
+    final intense = AlarmMissionCatalog.missionsForDifficulty(
+      AlarmMissionDifficulty.intense,
+    );
+
+    expect(gentle.map((mission) => mission.type), contains(AlarmMissionType.affirmation));
+    expect(focused.map((mission) => mission.type), contains(AlarmMissionType.barcodeScan));
+    expect(intense.map((mission) => mission.type), contains(AlarmMissionType.stepCounter));
+    expect(intense.map((mission) => mission.type), isNot(contains(AlarmMissionType.memoryGrid)));
   });
 }

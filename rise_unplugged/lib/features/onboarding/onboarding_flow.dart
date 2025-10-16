@@ -8,6 +8,8 @@ import '../../shared/widgets/gradient_background.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../../services/notifications/notification_permission_service.dart';
 import '../alarms/providers/alarm_schedule_provider.dart';
+import '../sleep_debt/models/sleep_persona.dart';
+import '../sleep_debt/providers/sleep_debt_provider.dart';
 import 'onboarding_controller.dart';
 
 class OnboardingFlow extends ConsumerStatefulWidget {
@@ -23,29 +25,46 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   final PageController _controller = PageController();
   int _index = 0;
   bool _isCompleting = false;
+  SleepChronotype? _chronotype;
+  WakeChallenge? _wakeChallenge;
+  MorningFocus? _morningFocus;
 
   @override
   Widget build(BuildContext context) {
-    const pages = [
-      _OnboardingPage(
+    final pages = [
+      const _OnboardingPage(
         title: 'Rested mornings',
         subtitle:
             'Personalised wake windows and gentle follow-up prompts keep you on rhythm.',
         icon: Icons.alarm_rounded,
       ),
-      _OnboardingPage(
+      const _OnboardingPage(
         title: 'Understand your sleep debt',
         subtitle:
             'Track weekly rest, debts, and wins with science-backed insights.',
         icon: Icons.auto_graph_rounded,
       ),
-      _OnboardingPage(
+      const _OnboardingPage(
         title: 'Unplug with intention',
         subtitle:
             'Focus on calm rituals before the day begins with mindful timers.',
         icon: Icons.spa_rounded,
       ),
+      _PersonaFormPage(
+        chronotype: _chronotype,
+        challenge: _wakeChallenge,
+        focus: _morningFocus,
+        onChronotypeChanged: (value) => setState(() => _chronotype = value),
+        onChallengeChanged: (value) => setState(() => _wakeChallenge = value),
+        onFocusChanged: (value) => setState(() => _morningFocus = value),
+      ),
     ];
+
+    final isLastPage = _index == pages.length - 1;
+    final canComplete = !isLastPage ||
+        (_chronotype != null &&
+            _wakeChallenge != null &&
+            _morningFocus != null);
 
     return Scaffold(
       body: GradientBackground(
@@ -85,13 +104,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                 child: PrimaryButton(
-                  label: _index == pages.length - 1
-                      ? (_isCompleting ? 'Preparing...' : 'Get Started')
+                  label: isLastPage
+                      ? (_isCompleting ? 'Preparing...' : 'Finish setup')
                       : 'Next',
-                  onPressed: _isCompleting
+                  onPressed: _isCompleting || (isLastPage && !canComplete)
                       ? null
                       : () {
-                          if (_index == pages.length - 1) {
+                          if (isLastPage) {
                             unawaited(_completeOnboarding(context, ref));
                           } else {
                             _controller.animateToPage(
@@ -116,6 +135,17 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     await notifier.bootstrap();
     await const NotificationPermissionService().requestPermissions();
     await const NotificationPermissionService().ensureExactAlarmPermission();
+    if (_chronotype != null &&
+        _wakeChallenge != null &&
+        _morningFocus != null) {
+      await ref.read(sleepDebtProvider.notifier).setPersona(
+            SleepPersona(
+              chronotype: _chronotype!,
+              challenge: _wakeChallenge!,
+              morningFocus: _morningFocus!,
+            ),
+          );
+    }
     await ref.read(onboardingControllerProvider.notifier).markComplete();
     if (!mounted || !context.mounted) {
       return;
@@ -164,6 +194,115 @@ class _OnboardingPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PersonaFormPage extends StatelessWidget {
+  const _PersonaFormPage({
+    required this.chronotype,
+    required this.challenge,
+    required this.focus,
+    required this.onChronotypeChanged,
+    required this.onChallengeChanged,
+    required this.onFocusChanged,
+  });
+
+  final SleepChronotype? chronotype;
+  final WakeChallenge? challenge;
+  final MorningFocus? focus;
+  final ValueChanged<SleepChronotype> onChronotypeChanged;
+  final ValueChanged<WakeChallenge> onChallengeChanged;
+  final ValueChanged<MorningFocus> onFocusChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tailor your mornings',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'We\'ll use these to personalise sleep debt insights, alarm missions, and unplug rituals.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          Text('Your chronotype', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final option in SleepChronotype.values)
+                ChoiceChip(
+                  label: Text(option.label),
+                  selected: chronotype == option,
+                  onSelected: (_) => onChronotypeChanged(option),
+                ),
+            ],
+          ),
+          if (chronotype != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              chronotype!.summary,
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
+          const SizedBox(height: 24),
+          Text('Biggest wake-up challenge', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final option in WakeChallenge.values)
+                ChoiceChip(
+                  label: Text(option.label),
+                  selected: challenge == option,
+                  onSelected: (_) => onChallengeChanged(option),
+                ),
+            ],
+          ),
+          if (challenge != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              challenge!.insight,
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
+          const SizedBox(height: 24),
+          Text('Morning focus', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final option in MorningFocus.values)
+                ChoiceChip(
+                  label: Text(option.label),
+                  selected: focus == option,
+                  onSelected: (_) => onFocusChanged(option),
+                ),
+            ],
+          ),
+          if (focus != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              focus!.ritualSuggestion,
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

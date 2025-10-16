@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/sleep_persona.dart';
 import '../models/sleep_session.dart';
 
 class SleepDebtRepository {
@@ -10,6 +11,8 @@ class SleepDebtRepository {
   static const _sessionsKey = 'sleep_sessions';
   static const _goalKey = 'sleep_goal_minutes';
   static const _tooltipsKey = 'sleep_tooltips';
+  static const _personaKey = 'sleep_persona';
+  static const _digestKey = 'sleep_weekly_digest_enabled';
 
   final SharedPreferences _prefs;
 
@@ -48,5 +51,26 @@ class SleepDebtRepository {
 
   Future<void> saveTooltips(Set<String> tooltips) async {
     await _prefs.setStringList(_tooltipsKey, tooltips.toList());
+  }
+
+  Future<SleepPersona?> loadPersona() async {
+    final stored = _prefs.getString(_personaKey);
+    if (stored == null) {
+      return null;
+    }
+    final decoded = jsonDecode(stored) as Map<String, dynamic>;
+    return SleepPersona.fromJson(decoded);
+  }
+
+  Future<void> savePersona(SleepPersona persona) async {
+    await _prefs.setString(_personaKey, jsonEncode(persona.toJson()));
+  }
+
+  Future<bool> loadWeeklyDigestEnabled(bool fallback) async {
+    return _prefs.getBool(_digestKey) ?? fallback;
+  }
+
+  Future<void> saveWeeklyDigestEnabled(bool enabled) async {
+    await _prefs.setBool(_digestKey, enabled);
   }
 }

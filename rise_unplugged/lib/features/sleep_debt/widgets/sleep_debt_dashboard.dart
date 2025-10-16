@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 
 import '../../../services/health/health_integration_service.dart';
 import '../../../shared/utils/feature_flags.dart';
+import '../models/sleep_persona.dart';
 import '../models/sleep_session.dart';
 import '../providers/sleep_debt_provider.dart';
+import '../services/sleep_debt_export_service.dart';
 
 enum _ImportAction { appleHealth, googleFit }
 
@@ -66,6 +68,12 @@ class SleepDebtDashboard extends ConsumerWidget {
             goal: state.goalPerNight,
             totalDebtMinutes: totalDebtMinutes,
             tooltipVisible: !state.tooltipsSeen.contains('sleep_debt_info'),
+            persona: state.persona,
+            sessions: state.sessions,
+            weeklyDigestEnabled: state.weeklyDigestEnabled,
+            onDigestToggled: (value) =>
+                _toggleWeeklyDigest(context, ref, value),
+            onExport: () => _exportSessions(context, state.sessions),
           ),
           const SizedBox(height: 16),
           _SessionHistoryCard(sessions: state.sessions),
@@ -237,6 +245,56 @@ class SleepDebtDashboard extends ConsumerWidget {
     );
   }
 
+  Future<void> _toggleWeeklyDigest(
+    BuildContext context,
+    WidgetRef ref,
+    bool enabled,
+  ) async {
+    await ref
+        .read(sleepDebtProvider.notifier)
+        .setWeeklyDigestEnabled(enabled);
+    if (!context.mounted) {
+      return;
+    }
+    final message = enabled
+        ? 'Weekly digest enabled. Expect a Sunday morning summary.'
+        : 'Weekly digest disabled.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _exportSessions(
+    BuildContext context,
+    List<SleepSession> sessions,
+  ) async {
+    if (sessions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Log at least one session to export a summary.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await const SleepDebtExportService().shareSessions(sessions);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sleep summary ready to share!')),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to share summary: $error')),
+      );
+    }
+  }
+
   Future<DateTime?> _pickDateTime(
       BuildContext context, DateTime initial) async {
     final date = await showDatePicker(
@@ -377,6 +435,11 @@ class _InsightsCard extends StatelessWidget {
     required this.goal,
     required this.totalDebtMinutes,
     required this.tooltipVisible,
+    required this.persona,
+    required this.sessions,
+    required this.weeklyDigestEnabled,
+    required this.onDigestToggled,
+    required this.onExport,
   });
 
   final FeatureFlags flags;
@@ -384,11 +447,16 @@ class _InsightsCard extends StatelessWidget {
   final Duration goal;
   final int totalDebtMinutes;
   final bool tooltipVisible;
+  final SleepPersona? persona;
+  final List<SleepSession> sessions;
+  final bool weeklyDigestEnabled;
+  final ValueChanged<bool> onDigestToggled;
+  final VoidCallback onExport;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final message = _insightMessage(entries, goal, flags, totalDebtMinutes);
+    final insights = _buildInsights(context);
 
     return Card(
       child: Padding(
@@ -399,38 +467,204 @@ class _InsightsCard extends StatelessWidget {
             Text('Insights', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
             AnimatedOpacity(
-              opacity: tooltipVisible ? 1 : 0.7,
+              opacity: tooltipVisible ? 1 : 0.82,
               duration: const Duration(milliseconds: 300),
-              child: Text(message),
+              child: Column(
+                children: [
+                  for (var i = 0; i < insights.length; i++) ...[
+                    _InsightTile(insight: insights[i]),
+                    if (i != insights.length - 1) const SizedBox(height: 12),
+                  ],
+                ],
+              ),
             ),
+            if (flags.enableExports) ...[
+              const Divider(height: 32),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                value: weeklyDigestEnabled,
+                onChanged: onDigestToggled,
+                title: const Text('Auto-share weekly digest'),
+                subtitle: const Text(
+                  'Receive a Sunday morning summary with debt trends and wins.',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: sessions.isEmpty ? null : onExport,
+                      icon: const Icon(Icons.ios_share_outlined),
+                      label: const Text('Export latest report'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  String _insightMessage(
-    List<MapEntry<DateTime, Duration>> entries,
-    Duration goal,
-    FeatureFlags flags,
-    int totalDebtMinutes,
-  ) {
+  List<_Insight> _buildInsights(BuildContext context) {
     if (entries.isEmpty) {
-      return 'Log your sleep to see weekly debt trends and recommendations.';
+      return const [
+        _Insight(
+          icon: Icons.explore_outlined,
+          title: 'Start logging',
+          message:
+              'Capture at least three nights of sleep to unlock personalised coaching.',
+        ),
+      ];
     }
+
+    final nightsTracked = entries.length;
+    final restfulNights =
+        entries.where((entry) => entry.value.inMinutes <= 15).length;
+    final locale = MaterialLocalizations.of(context);
+    final baseLightsOut = persona?.chronotype.idealLightsOut ??
+        const TimeOfDay(hour: 22, minute: 30);
+    final recommendedShift = _recommendedAdjustment();
+    final adjustedLightsOut = _shift(baseLightsOut, minutes: -recommendedShift);
+    final lightsOutLabel = locale.formatTimeOfDay(adjustedLightsOut);
+    final debtLabel = _formatDebt();
+    final insights = <_Insight>[];
+
     if (totalDebtMinutes <= goal.inMinutes) {
-      return 'Beautiful work! You are within a single night of your goal.';
+      insights.add(_Insight(
+        icon: Icons.celebration_outlined,
+        title: 'Sleep debt recovered',
+        message:
+            'Beautiful work! Keep lights out near $lightsOutLabel to protect your gains.',
+      ));
+    } else {
+      final prefix = flags.enableAiInsights ? 'AI cue • ' : '';
+      insights.add(_Insight(
+        icon: Icons.auto_awesome_outlined,
+        title: '${prefix}Tonight\'s recovery target',
+        message:
+            'Aim for lights out around $lightsOutLabel — about $recommendedShift minutes earlier — to chip away at $debtLabel of sleep debt.',
+      ));
     }
-    if (flags.enableAiInsights) {
-      return 'AI insights recommend an earlier wind-down based on your recent wake patterns.';
+
+    if (persona != null) {
+      insights
+        ..add(_Insight(
+          icon: Icons.bedtime_outlined,
+          title: '${persona!.chronotype.label} rhythm',
+          message:
+              '${persona!.chronotype.summary} Use the $lightsOutLabel lights-out cue to align with your natural rhythm.',
+        ))
+        ..add(_Insight(
+          icon: Icons.alarm_on_outlined,
+          title: 'Wake backup plan',
+          message: persona!.challenge.insight,
+        ))
+        ..add(_Insight(
+          icon: Icons.self_improvement_outlined,
+          title: 'Morning ritual focus',
+          message: persona!.morningFocus.ritualSuggestion,
+        ));
+    } else {
+      insights.add(const _Insight(
+        icon: Icons.timeline_outlined,
+        title: 'Lock in a wind-down',
+        message:
+            'Pick a consistent wind-down 45 minutes before bed to help shrink your sleep debt.',
+      ));
     }
-    if (flags.enableStreaks) {
-      return 'Keep your streak alive by targeting a 15-minute earlier bedtime tonight.';
+
+    insights.add(_Insight(
+      icon: Icons.emoji_events_outlined,
+      title: 'Streak momentum',
+      message: restfulNights > 0
+          ? '$restfulNights of $nightsTracked nights met your goal. Keep the streak alive tonight.'
+          : 'No goal nights logged yet. Schedule a recovery evening within the next three days.',
+    ));
+
+    return insights;
+  }
+
+  int _recommendedAdjustment() {
+    if (entries.isEmpty || totalDebtMinutes <= 0) {
+      return 0;
     }
-    if (flags.enableExports) {
-      return 'Export your data to review longer-term trends with your sleep coach.';
+    final nightlyDebt = totalDebtMinutes / entries.length;
+    final clamped = nightlyDebt.clamp(10, 90);
+    final rounded = (clamped / 5).ceil() * 5;
+    return rounded.toInt();
+  }
+
+  String _formatDebt() {
+    if (totalDebtMinutes <= 0) {
+      return '0m';
     }
-    return 'Consider adding a 20-minute nap or heading to bed 30 minutes earlier tonight.';
+    final hours = totalDebtMinutes ~/ 60;
+    final minutes = totalDebtMinutes % 60;
+    if (hours > 0 && minutes > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    if (hours > 0) {
+      return '${hours}h';
+    }
+    return '${minutes}m';
+  }
+
+  TimeOfDay _shift(TimeOfDay time, {int minutes = 0}) {
+    final totalMinutes = time.hour * 60 + time.minute + minutes;
+    final normalized = (totalMinutes % (24 * 60) + (24 * 60)) % (24 * 60);
+    return TimeOfDay(hour: normalized ~/ 60, minute: normalized % 60);
+  }
+}
+
+class _Insight {
+  const _Insight({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+}
+
+class _InsightTile extends StatelessWidget {
+  const _InsightTile({required this.insight});
+
+  final _Insight insight;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(insight.icon, color: theme.colorScheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                insight.title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                insight.message,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 
