@@ -3,6 +3,6 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://aging-at-home-lab.netlify.app',
+  site: 'https://rise-unplugged.vercel.app',
   integrations: [mdx(), sitemap()],
 });
