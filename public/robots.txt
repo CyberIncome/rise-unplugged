@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aging-at-home-lab.netlify.app/sitemap-index.xml
+Sitemap: https://rise-unplugged.vercel.app/sitemap-index.xml
