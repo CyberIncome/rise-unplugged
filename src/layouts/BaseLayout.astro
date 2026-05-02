@@ -1,0 +1,38 @@
+---
+import '../styles/global.css';
+
+const {
+  title = 'Aging at Home Lab',
+  description = 'Practical checklists, home-safety guides, and caregiver organization systems for families helping older adults stay safer at home.',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">Aging at Home Lab</a>
+        <div class="nav-links">
+          <a href="/start-here/">Start Here</a>
+          <a href="/home-safety/">Home Safety</a>
+          <a href="/caregiver-organization/">Caregiver Organization</a>
+          <a href="/templates/">Templates</a>
+          <a href="/about/">About</a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p><strong>Aging at Home Lab</strong> provides general educational information and organization tools. It is not medical, legal, financial, construction, or individualized safety advice.</p>
+      <p>For decisions affecting health, medications, legal authority, home modifications, or personal safety, talk with a qualified professional.</p>
+    </footer>
+  </body>
+</html>
