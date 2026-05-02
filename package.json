@@ -1,15 +1,17 @@
 {
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "check": "astro check",
+    "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/check": "latest",
     "@astrojs/mdx": "latest",
     "@astrojs/sitemap": "latest",
-    "astro": "latest",
-    "typescript": "latest"
+    "astro": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "typescript": "latest"
+  }
 }
