@@ -2,29 +2,38 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Templates | Aging at Home Lab" description="Printable caregiver checklists, planning tools, and aging-in-place templates.">
-  <article class="prose">
-    <p class="eyebrow">Templates</p>
-    <h1>Printable tools for safer, more organized care.</h1>
-    <p>The template library will include practical PDF and web-based tools for families who need to organize care information and home-safety tasks quickly.</p>
-
-    <h2>In development</h2>
-    <div class="grid">
-      <section class="card">
-        <h3>Aging at Home Master Checklist</h3>
-        <p>A room-by-room checklist for first-pass home safety and caregiver organization.</p>
-      </section>
-      <section class="card">
-        <h3>Family Caregiver Binder</h3>
-        <p>Emergency contacts, medication lists, doctors, appointments, home access instructions, and care notes.</p>
-      </section>
-      <section class="card">
-        <h3>Medication List Template</h3>
-        <p>A simple worksheet for medication name, dose, schedule, prescriber, pharmacy, and important notes.</p>
-      </section>
-      <section class="card">
-        <h3>Sibling Coordination Worksheet</h3>
-        <p>A practical way to divide appointments, groceries, check-ins, home tasks, pharmacy pickups, and paperwork.</p>
-      </section>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Templates</p>
+      <h1>Printable tools for safer, more organized care.</h1>
+      <p class="lede">Simple worksheets and checklists for families who need to organize care information and home-safety tasks quickly.</p>
     </div>
-  </article>
+  </section>
+
+  <section class="guide-grid" aria-label="Template library">
+    <article class="guide-card">
+      <div class="guide-meta">
+        <span class="badge">Printable</span>
+        <span class="badge warning-badge">draft</span>
+      </div>
+      <h3><a href="/templates/aging-at-home-master-checklist/">Aging at Home Master Checklist</a></h3>
+      <p>A first-pass room-by-room checklist for home safety, emergency readiness, and caregiver organization.</p>
+    </article>
+    <article class="guide-card">
+      <div class="guide-meta">
+        <span class="badge">Template</span>
+        <span class="badge warning-badge">planned</span>
+      </div>
+      <h3>Family Caregiver Binder</h3>
+      <p>Emergency contacts, medication lists, doctors, appointments, home access instructions, and care notes.</p>
+    </article>
+    <article class="guide-card">
+      <div class="guide-meta">
+        <span class="badge">Template</span>
+        <span class="badge warning-badge">planned</span>
+      </div>
+      <h3>Medication List Template</h3>
+      <p>A simple worksheet for medication name, dose, schedule, prescriber, pharmacy, and important notes.</p>
+    </article>
+  </section>
 </BaseLayout>
