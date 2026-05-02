@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((guide) => ({
+    params: { slug: guide.id.replace(/\.mdx?$/, '') },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+---
+<BaseLayout title={`${guide.data.title} | Aging at Home Lab`} description={guide.data.description}>
+  <article class="prose">
+    <p class="eyebrow">{guide.data.pillar}</p>
+    <h1>{guide.data.title}</h1>
+    <p class="lede">{guide.data.description}</p>
+    <p class="meta">Status: {guide.data.status} · Risk level: {guide.data.riskLevel} · Expert review: {guide.data.expertReview}</p>
+    {guide.data.status !== 'published' && (
+      <div class="callout warning">
+        <strong>Draft notice:</strong> This guide is not final and should not be treated as reviewed public guidance yet.
+      </div>
+    )}
+    <Content />
+  </article>
+</BaseLayout>
