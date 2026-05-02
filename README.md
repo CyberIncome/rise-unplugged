@@ -10,6 +10,25 @@ Aging at Home Lab exists to help adult children, family caregivers, and older ad
 
 The goal is not to publish generic advice. Every major guide should include practical next steps, credible sourcing, original templates or visuals, and clear boundaries around medical, legal, financial, and safety topics.
 
+## Site stack
+
+- Astro
+- MDX
+- Netlify
+- GitHub-backed content workflow
+
+## Netlify settings
+
+Use these settings when importing or deploying the repo:
+
+```text
+Build command: npm run build
+Publish directory: dist
+Node version: 20
+```
+
+The repo also includes `netlify.toml`, so Netlify should detect the same settings automatically.
+
 ## Core content pillars
 
 1. **Home Safety** — room-by-room aging-in-place checklists, fall-risk reduction, bathroom safety, stairs, lighting, flooring, and emergency readiness.
@@ -33,4 +52,4 @@ The goal is not to publish generic advice. Every major guide should include prac
 
 This repo has been repurposed from an abandoned project and reset for Aging at Home Lab.
 
-Current stage: project foundation and editorial operating system.
+Current stage: Astro site foundation, Netlify deployment, and editorial operating system.
