@@ -5,7 +5,7 @@ import { getCollection, render } from 'astro:content';
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
   return guides.map((guide) => ({
-    params: { slug: guide.id.replace(/\.mdx?$/, '') },
+    params: { slug: guide.id },
     props: { guide },
   }));
 }
