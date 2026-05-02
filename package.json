@@ -1,1 +1,15 @@
-{"scripts":{"dev":"astro dev","build":"astro check && astro build","preview":"astro preview"},"dependencies":{"@astrojs/check":"latest","@astrojs/mdx":"latest","astro":"latest","typescript":"latest"},"devDependencies":{}}
+{
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/check": "latest",
+    "@astrojs/mdx": "latest",
+    "@astrojs/sitemap": "latest",
+    "astro": "latest",
+    "typescript": "latest"
+  },
+  "devDependencies": {}
+}
