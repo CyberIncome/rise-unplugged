@@ -1,38 +1,79 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout>
+<BaseLayout title="Aging at Home Lab | Practical Aging-in-Place Checklists" description="Practical checklists, home-safety guides, and caregiver organization systems for families helping older adults stay safer at home.">
   <section class="hero">
-    <p class="eyebrow">Practical aging-in-place help</p>
-    <h1>Make aging at home feel less overwhelming.</h1>
-    <p class="lede">Aging at Home Lab creates calm, practical checklists, home-safety guides, and caregiver organization tools for families helping older adults stay safer and more supported at home.</p>
-    <div class="button-row">
-      <a class="button primary" href="/start-here/">Start with the checklist</a>
-      <a class="button secondary" href="/templates/">View templates</a>
+    <div class="hero-copy">
+      <p class="eyebrow">Practical aging-in-place help</p>
+      <h1>Make aging at home feel less overwhelming.</h1>
+      <p class="lede">Calm, practical checklists and caregiver tools for families helping older adults stay safer, more organized, and more supported at home.</p>
+      <div class="button-row">
+        <a class="button primary" href="/start-here/">Start with the checklist</a>
+        <a class="button secondary" href="/guides/complete-aging-in-place-checklist/">Preview the first guide</a>
+      </div>
+    </div>
+
+    <aside class="hero-card" aria-label="Aging at Home master checklist preview">
+      <div class="checklist-card">
+        <div class="checklist-top">
+          <div>
+            <div class="eyebrow">Draft asset</div>
+            <div class="checklist-title">Aging at Home Master Checklist</div>
+          </div>
+          <span class="status-pill">In review</span>
+        </div>
+        <div class="check-item"><span class="check-dot"></span><span>Clear walking paths and obvious trip hazards.</span></div>
+        <div class="check-item"><span class="check-dot"></span><span>Check bathroom, bedroom, stairs, lighting, and entryways.</span></div>
+        <div class="check-item"><span class="check-dot"></span><span>Organize medications, emergency contacts, and home access notes.</span></div>
+        <div class="mini-note">Built for families who need a practical first pass before deciding what needs professional help.</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="trust-row" aria-label="Editorial trust principles">
+    <div class="trust-item">No fear-based selling.</div>
+    <div class="trust-item">Clear professional-help triggers.</div>
+    <div class="trust-item">Checklists before product pitches.</div>
+  </section>
+
+  <section aria-labelledby="guide-categories">
+    <p class="eyebrow">Resource library</p>
+    <h2 id="guide-categories">Built around the decisions families actually face.</h2>
+    <p class="section-kicker">Each section is designed to become a practical library of guides, templates, diagrams, and product decision frameworks.</p>
+    <div class="grid" aria-label="Core guide categories">
+      <article class="card">
+        <div class="card-icon">01</div>
+        <h3>Home Safety</h3>
+        <p>Room-by-room checklists for bathrooms, bedrooms, kitchens, stairs, entries, lighting, and common fall-risk areas.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">02</div>
+        <h3>Caregiver Organization</h3>
+        <p>Binder pages, medication lists, emergency contacts, appointment notes, sibling coordination tools, and weekly care check-ins.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">03</div>
+        <h3>Senior Tech</h3>
+        <p>Plain-English decision guides for medical alerts, fall detection, privacy-safe monitoring, medication reminders, and caregiver apps.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon">04</div>
+        <h3>Home Modifications</h3>
+        <p>Questions to ask before installing grab bars, ramps, stair lifts, shower changes, lighting upgrades, and accessibility improvements.</p>
+      </article>
     </div>
   </section>
 
-  <section class="grid" aria-label="Core guide categories">
-    <article class="card">
-      <h3>Home Safety</h3>
-      <p>Room-by-room checklists for bathrooms, bedrooms, kitchens, stairs, entries, lighting, and common fall-risk areas.</p>
-    </article>
-    <article class="card">
-      <h3>Caregiver Organization</h3>
-      <p>Binder pages, medication lists, emergency contacts, appointment notes, sibling coordination tools, and weekly care check-ins.</p>
-    </article>
-    <article class="card">
-      <h3>Senior Tech</h3>
-      <p>Plain-English decision guides for medical alerts, fall detection, privacy-safe monitoring, medication reminders, and caregiver apps.</p>
-    </article>
-    <article class="card">
-      <h3>Home Modifications</h3>
-      <p>Questions to ask before installing grab bars, ramps, stair lifts, shower changes, lighting upgrades, and accessibility improvements.</p>
-    </article>
-  </section>
-
-  <section class="callout">
-    <h2>Built for the moment when families need a next step.</h2>
-    <p>Many families start searching after a fall, hospital stay, missed medication, or hard conversation about independence. Our job is to make the next step clearer without using fear-based selling or pretending a checklist replaces professional judgment.</p>
+  <section class="split-section">
+    <div class="callout">
+      <p class="eyebrow">Why this exists</p>
+      <h2>For the moment when a family needs a next step.</h2>
+      <p>Many families start searching after a fall, hospital stay, missed medication, or hard conversation about independence. Our job is to make the next step clearer without pretending a checklist replaces professional judgment.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✓</div>
+      <h3>Our publishing rule</h3>
+      <p>Every major guide should include practical next steps, credible source support, and an original asset such as a checklist, worksheet, comparison table, or decision tree.</p>
+    </div>
   </section>
 </BaseLayout>
