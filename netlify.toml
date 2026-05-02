@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+
+[[redirects]]
+  from = "/start"
+  to = "/start-here/"
+  status = 301
