@@ -1,24 +1,45 @@
 # Source Verification Dossier: Complete Aging-in-Place Checklist
 
-Status: Verification plan and claim map. External sources still need live verification before publication.
+Status: Partially verified. Core safety framing has authoritative source support. Final publication still needs article-level citations added directly to the public draft and, ideally, expert review.
 
 This dossier identifies the claims, source types, and publication blockers for the flagship article and master checklist.
 
 ## Publication rule
 
-Do not publish the cornerstone article or public PDF until the required claims are checked against current sources.
+Do not publish the cornerstone article or public PDF as final until the required claims are checked against current sources and article-level citations are inserted.
 
-## Required source targets
+## Verified anchor sources
 
-Use current versions of these source categories before publication:
+Use these as the first source set for the cornerstone guide:
 
-1. National Institute on Aging home safety / aging in place guidance
-2. CDC fall prevention resources
-3. Administration for Community Living / Eldercare Locator caregiver resources
-4. AARP family caregiving resources
-5. Occupational therapy or certified aging-in-place professional guidance
-6. Product/manufacturer documentation for any specific safety product claims
-7. CPSC or recall-related resources for product safety concerns where relevant
+1. CDC - Older Adult Fall Prevention
+   - Supports: falls are a major threat to independence; fall prevention is possible; older-adult falls are a major injury and emergency-care issue.
+   - Source found: CDC older-adult fall prevention pages, including facts/stats and prevention guidance.
+
+2. CDC - Preventing Falls and Hip Fractures
+   - Supports: talking to a doctor about fall risk, medication review with doctor/pharmacist, strength/balance activities, and screening/treatment considerations.
+
+3. Ready.gov - Older Adults
+   - Supports: older adults and caregivers should assess needs, create a plan, engage a support network, include medicines/medical supplies/chargers, make copies of insurance cards, and ensure trusted people know where supplies are and how to help.
+
+4. CPSC - Adult Portable Bed Rails
+   - Supports: adult portable bed rails can help with mobility/support but involve entrapment/asphyxiation risks; users should check recalls, follow instructions, prevent gaps, and consider whether bed rails are appropriate for the situation.
+
+5. CPSC - Federal Mandatory Safety Standard for Adult Portable Bed Rails
+   - Supports: adult portable bed rails have documented entrapment hazards and are subject to mandatory safety standards for products manufactured after the effective date.
+
+6. AARP / National Alliance for Caregiving - Caregiving in the U.S. 2025
+   - Supports: family caregiving is large-scale, increasingly complex, often unpaid, and many caregivers lack formal training.
+
+## Still-needed source targets
+
+Before final publication, find and add sources for:
+
+1. National Institute on Aging or similar home-safety page with room-by-room home safety guidance.
+2. Occupational therapy or certified aging-in-place professional guidance for home assessment and modification framing.
+3. Reputable medication-safety source for caregiver medication lists and pharmacist/clinician review.
+4. Source for visible house numbers / emergency responder access if stated as more than common-sense preparedness.
+5. Home modification professional or government/nonprofit guidance for grab bars, shower chairs, transfer benches, ramps, and stair lifts.
 
 ## Claim-to-source map
 
@@ -35,6 +56,11 @@ Best sources:
 - CDC fall prevention resources
 - National Institute on Aging home safety resources
 - Occupational therapy home assessment resources
+
+Verification status:
+
+- Partially verified via CDC for fall risk seriousness and prevention framing.
+- Needs one room-by-room home-safety source before final publication.
 
 Draft locations:
 
@@ -59,6 +85,10 @@ Best sources:
 - NIA or other aging-in-place safety resources
 - CPSC/recall sources if specific product categories are discussed
 
+Verification status:
+
+- Not fully verified. Keep product language conservative until OT/home-modification sources are added.
+
 Draft locations:
 
 - Bathroom checklist
@@ -78,6 +108,11 @@ Best sources:
 - Occupational therapy resources
 - CPSC/medical-device safety resources for bed rail concerns
 
+Verification status:
+
+- Bed rail caution is verified through CPSC.
+- General bedroom checklist still needs home-safety source support.
+
 Draft locations:
 
 - Bedroom section
@@ -95,6 +130,10 @@ Best sources:
 - NIA home safety guidance
 - Fire safety resources such as NFPA or local fire safety agencies
 - Dementia/alzheimer's organization sources if memory-related cooking risks are discussed
+
+Verification status:
+
+- Not fully verified. Keep as practical checklist language until source support is added.
 
 Draft locations:
 
@@ -114,6 +153,11 @@ Best sources:
 - Medicare or healthcare organization patient-safety resources
 - Pharmacist or clinical sources
 
+Verification status:
+
+- Partially supported by CDC fall-prevention guidance recommending doctor/pharmacist medication review for fall-risk concerns.
+- Needs medication-list/medication-management source before final publication.
+
 Draft locations:
 
 - Medication and appointment organization
@@ -123,13 +167,18 @@ Draft locations:
 
 Claims to verify:
 
-- Emergency contact lists, visible house numbers, access instructions, charged phones, and key documents can help families and responders respond faster.
+- Emergency contact lists, home access instructions, charged phones, and key documents can help families and responders respond faster.
 
 Best sources:
 
 - Ready.gov / FEMA emergency preparedness resources
 - Local emergency-services guidance
 - ACL caregiver resources
+
+Verification status:
+
+- Partially verified via Ready.gov older-adult emergency planning guidance.
+- House-number/emergency-responder visibility claim needs source or should remain a practical suggestion.
 
 Draft locations:
 
@@ -149,6 +198,11 @@ Best sources:
 - AARP caregiving resources
 - State bar or elder-law resources for legal-topic framing
 
+Verification status:
+
+- Partially verified for doctor/pharmacist fall-risk medication review via CDC.
+- Needs additional professional-role sources before final publication.
+
 Draft locations:
 
 - When to call a professional
@@ -156,7 +210,7 @@ Draft locations:
 
 ## Claims to avoid until verified
 
-Do not publish exact statistics unless freshly sourced:
+Do not publish exact statistics unless freshly sourced in the article itself:
 
 - Percent of older adults who fall
 - Number of fall-related hospitalizations or deaths
@@ -164,6 +218,8 @@ Do not publish exact statistics unless freshly sourced:
 - Product-specific effectiveness rates
 - Medical-alert response-time claims
 - Medicare/insurance coverage claims
+
+Exception: CDC fall statistics can be used if cited directly to current CDC pages.
 
 ## Editorial changes needed before publication
 
@@ -195,9 +251,11 @@ Suggested review questions:
 
 Before publishing publicly:
 
-- [ ] Verify current sources.
-- [ ] Add citations/source links.
+- [x] Identify first authoritative source anchors.
+- [ ] Add article-level citations/source links.
+- [ ] Verify home-safety room-by-room guidance source.
+- [ ] Verify medication-list guidance source.
 - [ ] Review safety-sensitive product language.
-- [ ] Create polished PDF.
+- [x] Create polished draft PDF.
 - [ ] Add disclaimer and affiliate disclosure if links are used.
 - [ ] Decide whether to obtain expert review before first publication or publish as general education with clear limits.
