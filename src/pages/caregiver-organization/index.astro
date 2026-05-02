@@ -1,21 +1,33 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const guides = await getCollection('guides', ({ data }) => data.pillar === 'Caregiver Organization');
 ---
 <BaseLayout title="Caregiver Organization | Aging at Home Lab" description="Caregiver binder pages, emergency contact sheets, medication lists, appointment notes, and family coordination tools.">
-  <article class="prose">
-    <p class="eyebrow">Caregiver Organization</p>
-    <h1>Turn scattered care details into a system.</h1>
-    <p>Caregiving becomes harder when medications, contacts, appointments, documents, and responsibilities are scattered across phones, drawers, texts, and memory. This section focuses on practical organization tools families can actually use.</p>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Caregiver Organization</p>
+      <h1>Turn scattered care details into a system.</h1>
+      <p class="lede">Caregiving gets harder when medications, contacts, appointments, documents, and responsibilities are scattered across phones, drawers, texts, and memory.</p>
+    </div>
+  </section>
 
-    <h2>Planned resources</h2>
-    <ul>
-      <li>Family Caregiver Binder: What to Include</li>
-      <li>Medication List Template for Caregivers</li>
-      <li>Doctor Appointment Notes Template</li>
-      <li>Emergency Contact Sheet for Aging Parents</li>
-      <li>Caregiver Calendar Template</li>
-      <li>How to Coordinate Care Between Siblings</li>
-      <li>Hospital Go-Bag Checklist for Older Adults</li>
-    </ul>
-  </article>
+  <section class="guide-grid" aria-label="Caregiver organization guides">
+    {guides.map((guide) => (
+      <article class="guide-card">
+        <div class="guide-meta">
+          <span class="badge">{guide.data.pillar}</span>
+          <span class={guide.data.status === 'published' ? 'badge' : 'badge warning-badge'}>{guide.data.status}</span>
+        </div>
+        <h3><a href={`/guides/${guide.id}/`}>{guide.data.title}</a></h3>
+        <p>{guide.data.description}</p>
+      </article>
+    ))}
+  </section>
+
+  <section class="callout">
+    <h2>Coming next</h2>
+    <p>Medication list, appointment notes, emergency contact sheet, sibling coordination, and hospital go-bag templates will be added as this library expands.</p>
+  </section>
 </BaseLayout>
