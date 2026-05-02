@@ -4,6 +4,12 @@
 
 This repository is the operating base for the Aging at Home Lab publishing project.
 
+Production URL:
+
+```text
+https://rise-unplugged.vercel.app/
+```
+
 ## Mission
 
 Aging at Home Lab exists to help adult children, family caregivers, and older adults make safer, clearer, better-organized decisions about aging in place.
@@ -14,20 +20,22 @@ The goal is not to publish generic advice. Every major guide should include prac
 
 - Astro
 - MDX
-- Netlify
+- Vercel
 - GitHub-backed content workflow
 
-## Netlify settings
+## Vercel settings
 
 Use these settings when importing or deploying the repo:
 
 ```text
+Framework preset: Astro
 Build command: npm run build
-Publish directory: dist
-Node version: 20
+Output directory: dist
+Install command: npm install
+Node version: 22.x or newer
 ```
 
-The repo also includes `netlify.toml`, so Netlify should detect the same settings automatically.
+The repo also includes `vercel.json`, `.nvmrc`, and package `engines.node` to keep builds on Node 22+.
 
 ## Core content pillars
 
@@ -52,4 +60,4 @@ The repo also includes `netlify.toml`, so Netlify should detect the same setting
 
 This repo has been repurposed from an abandoned project and reset for Aging at Home Lab.
 
-Current stage: Astro site foundation, Netlify deployment, and editorial operating system.
+Current stage: Astro site foundation, Vercel deployment, and editorial operating system.
