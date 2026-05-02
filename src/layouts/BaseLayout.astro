@@ -17,7 +17,10 @@ const {
   <body>
     <header class="site-header">
       <nav class="nav" aria-label="Primary navigation">
-        <a class="brand" href="/">Aging at Home Lab</a>
+        <a class="brand" href="/" aria-label="Aging at Home Lab home">
+          <span class="brand-mark">A</span>
+          <span>Aging at Home Lab</span>
+        </a>
         <div class="nav-links">
           <a href="/start-here/">Start Here</a>
           <a href="/home-safety/">Home Safety</a>
@@ -31,8 +34,17 @@ const {
       <slot />
     </main>
     <footer class="site-footer">
-      <p><strong>Aging at Home Lab</strong> provides general educational information and organization tools. It is not medical, legal, financial, construction, or individualized safety advice.</p>
-      <p>For decisions affecting health, medications, legal authority, home modifications, or personal safety, talk with a qualified professional.</p>
+      <div class="footer-grid">
+        <div>
+          <p><strong>Aging at Home Lab</strong> provides general educational information and organization tools. It is not medical, legal, financial, construction, or individualized safety advice.</p>
+          <p>For decisions affecting health, medications, legal authority, home modifications, or personal safety, talk with a qualified professional.</p>
+        </div>
+        <div class="footer-links" aria-label="Footer links">
+          <a href="/about/">About</a>
+          <a href="/editorial-policy/">Editorial Policy</a>
+          <a href="/start-here/">Start Here</a>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
