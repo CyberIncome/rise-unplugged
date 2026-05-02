@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aging-at-home-lab.netlify.app/sitemap-index.xml
