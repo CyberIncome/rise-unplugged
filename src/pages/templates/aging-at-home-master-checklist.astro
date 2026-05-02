@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const sections = [
+  {
+    title: 'First priorities',
+    items: [
+      'Clear main walking paths.',
+      'Remove loose clutter from floors.',
+      'Check loose rugs, curled rug edges, and cords.',
+      'Improve lighting in hallways, stairs, bedroom, bathroom, and entryways.',
+      'Make sure frequently used items are reachable without climbing.',
+      'Confirm there is a way to call for help from bedroom, bathroom, and main living area.',
+    ],
+  },
+  {
+    title: 'Bathroom',
+    items: [
+      'Check for slippery tub or shower surfaces.',
+      'Check whether the route to the bathroom is well lit at night.',
+      'Keep toiletries within easy reach.',
+      'Notice whether towel bars, counters, or shower doors are being used for support.',
+      'Discuss shower chairs, transfer benches, raised toilet seats, or properly installed grab bars with a qualified professional when needed.',
+      'Keep the floor dry and uncluttered.',
+    ],
+  },
+  {
+    title: 'Caregiver information',
+    items: [
+      'Create a current medication list.',
+      'List allergies and adverse reactions.',
+      'List doctors, specialists, pharmacy, and emergency contacts.',
+      'Document preferred hospital and insurance information.',
+      'Write down home access instructions for trusted helpers.',
+      'Identify who handles appointments, pharmacy pickups, groceries, bills, and check-ins.',
+    ],
+  },
+  {
+    title: 'Professional-help triggers',
+    items: [
+      'Recent fall or near-fall.',
+      'Trouble with stairs, transfers, bathing, toileting, or walking paths.',
+      'Medication mistakes or confusion.',
+      'Memory, wandering, judgment, or cooking safety concerns.',
+      'Major modifications such as ramps, stair lifts, grab bars, or shower changes are being considered.',
+      'The person is returning home after a hospital or rehab stay.',
+    ],
+  },
+];
+---
+<BaseLayout title="Aging at Home Master Checklist | Aging at Home Lab" description="A printable web checklist for first-pass aging-in-place home safety and caregiver organization.">
+  <article class="print-sheet">
+    <p class="eyebrow">Printable template</p>
+    <h1>Aging at Home Master Checklist</h1>
+    <p class="lede">A first-pass checklist for families reviewing home safety, emergency readiness, and caregiver organization.</p>
+
+    <div class="callout warning">
+      <strong>Draft notice:</strong> This resource is for general organization and education. It is not a professional home assessment or individualized safety advice.
+    </div>
+
+    {sections.map((section) => (
+      <section class="print-section">
+        <h2>{section.title}</h2>
+        {section.items.map((item) => (
+          <div class="print-check">
+            <span class="print-box"></span>
+            <span>{item}</span>
+          </div>
+        ))}
+      </section>
+    ))}
+
+    <section class="print-section">
+      <h2>First five actions</h2>
+      {[1, 2, 3, 4, 5].map((number) => (
+        <div class="print-check">
+          <span>{number}.</span>
+          <span>____________________________________________________________</span>
+        </div>
+      ))}
+    </section>
+
+    <div class="button-row">
+      <button class="button primary" onclick="window.print()">Print this checklist</button>
+      <a class="button secondary" href="/guides/complete-aging-in-place-checklist/">Read the full guide</a>
+    </div>
+  </article>
+</BaseLayout>
