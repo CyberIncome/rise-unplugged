@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const rows = Array.from({ length: 8 });
+---
+<BaseLayout title="Medication List Template | Aging at Home Lab" description="A printable medication list template for caregivers to track medication names, doses, schedules, prescribers, pharmacies, and questions.">
+  <article class="print-sheet">
+    <p class="eyebrow">Printable template</p>
+    <h1>Medication List Template</h1>
+    <p class="lede">Use this worksheet to organize medication details before appointments, emergencies, or caregiver handoffs.</p>
+    <div class="callout warning">
+      <strong>Important:</strong> This template is for organization only. Do not start, stop, or change medications without guidance from a qualified clinician or pharmacist.
+    </div>
+    <section class="print-section">
+      <h2>Person and pharmacy</h2>
+      <div class="print-check"><span>Name:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Date updated:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Primary pharmacy:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Pharmacy phone:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Allergies / reactions:</span><span>____________________________________________</span></div>
+    </section>
+    <section class="print-section">
+      <h2>Current medications</h2>
+      {rows.map((_, index) => (
+        <div class="print-section">
+          <h3>Medication {index + 1}</h3>
+          <div class="print-check"><span>Name:</span><span>____________________________________________</span></div>
+          <div class="print-check"><span>Dose:</span><span>____________________________________________</span></div>
+          <div class="print-check"><span>Schedule:</span><span>____________________________________________</span></div>
+          <div class="print-check"><span>Prescriber:</span><span>____________________________________________</span></div>
+          <div class="print-check"><span>Notes/questions:</span><span>____________________________________________</span></div>
+        </div>
+      ))}
+    </section>
+    <div class="button-row">
+      <button class="button primary" onclick="window.print()">Print this template</button>
+      <a class="button secondary" href="/guides/family-caregiver-binder-what-to-include/">Read the binder guide</a>
+    </div>
+  </article>
+</BaseLayout>
