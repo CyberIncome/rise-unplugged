@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const tasks = ['Appointments', 'Medication / pharmacy pickups', 'Groceries and meals', 'Transportation', 'Bills and paperwork', 'Home maintenance', 'Weekly check-ins', 'Emergency calls', 'Backup / respite care'];
+---
+<BaseLayout title="Family Responsibilities Worksheet | Aging at Home Lab" description="A printable family responsibilities worksheet for dividing caregiver tasks, backups, and check-in routines.">
+  <article class="print-sheet">
+    <p class="eyebrow">Printable template</p>
+    <h1>Family Responsibilities Worksheet</h1>
+    <p class="lede">Use this worksheet to turn vague promises into clear caregiver roles, backup plans, and check-in routines.</p>
+    <div class="callout warning">
+      <strong>Reality check:</strong> "Everyone will help" is not a plan. Write down who handles what, how often, and who is backup.
+    </div>
+    {tasks.map((task) => (
+      <section class="print-section">
+        <h2>{task}</h2>
+        <div class="print-check"><span>Primary person:</span><span>____________________________________________</span></div>
+        <div class="print-check"><span>Backup person:</span><span>____________________________________________</span></div>
+        <div class="print-check"><span>Frequency:</span><span>____________________________________________</span></div>
+        <div class="print-check"><span>Notes:</span><span>____________________________________________</span></div>
+      </section>
+    ))}
+    <section class="print-section">
+      <h2>Next family check-in</h2>
+      <div class="print-check"><span>Date:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Topics:</span><span>____________________________________________</span></div>
+    </section>
+    <div class="button-row">
+      <button class="button primary" onclick="window.print()">Print this worksheet</button>
+      <a class="button secondary" href="/guides/family-caregiver-binder-what-to-include/">Read the binder guide</a>
+    </div>
+  </article>
+</BaseLayout>
