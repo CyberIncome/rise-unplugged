@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const questionRows = Array.from({ length: 8 });
+const followUpRows = Array.from({ length: 6 });
+---
+<BaseLayout title="Doctor Appointment Notes Template | Aging at Home Lab" description="A printable appointment notes template for caregivers to track questions, medication changes, follow-up steps, and next appointments.">
+  <article class="print-sheet">
+    <p class="eyebrow">Printable template</p>
+    <h1>Doctor Appointment Notes Template</h1>
+    <p class="lede">Use this worksheet before, during, and after appointments so questions, instructions, and next steps do not get lost.</p>
+    <section class="print-section">
+      <h2>Appointment details</h2>
+      <div class="print-check"><span>Date:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Clinician / office:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Reason for visit:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Who attended:</span><span>____________________________________________</span></div>
+    </section>
+    <section class="print-section">
+      <h2>Questions to ask</h2>
+      {questionRows.map((_, index) => (
+        <div class="print-check"><span>{index + 1}.</span><span>____________________________________________</span></div>
+      ))}
+    </section>
+    <section class="print-section">
+      <h2>Notes and instructions</h2>
+      <div class="print-check"><span>Medication changes:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Tests / referrals:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Warning signs:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Next appointment:</span><span>____________________________________________</span></div>
+    </section>
+    <section class="print-section">
+      <h2>Follow-up tasks</h2>
+      {followUpRows.map((_, index) => (
+        <div class="print-check"><span class="print-box"></span><span>____________________________________________</span></div>
+      ))}
+    </section>
+    <div class="button-row">
+      <button class="button primary" onclick="window.print()">Print this template</button>
+      <a class="button secondary" href="/guides/family-caregiver-binder-what-to-include/">Read the binder guide</a>
+    </div>
+  </article>
+</BaseLayout>
