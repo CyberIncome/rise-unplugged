@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const contacts = ['Primary emergency contact', 'Backup family contact', 'Nearby neighbor or local helper', 'Primary care office', 'Pharmacy', 'Preferred hospital', 'Home care agency / paid caregiver', 'Pet care contact'];
+---
+<BaseLayout title="Emergency Contact Sheet | Aging at Home Lab" description="A printable emergency contact sheet for family caregivers and aging-in-place planning.">
+  <article class="print-sheet">
+    <p class="eyebrow">Printable template</p>
+    <h1>Emergency Contact Sheet</h1>
+    <p class="lede">Keep this sheet somewhere trusted helpers can find quickly during a care change, missed check-in, or emergency.</p>
+    <div class="callout warning">
+      <strong>Privacy note:</strong> Only share sensitive contact, access, or medical information with trusted people who need it.
+    </div>
+    <section class="print-section">
+      <h2>Person</h2>
+      <div class="print-check"><span>Name:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Address:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Phone:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Date updated:</span><span>____________________________________________</span></div>
+    </section>
+    {contacts.map((label) => (
+      <section class="print-section">
+        <h2>{label}</h2>
+        <div class="print-check"><span>Name:</span><span>____________________________________________</span></div>
+        <div class="print-check"><span>Phone:</span><span>____________________________________________</span></div>
+        <div class="print-check"><span>Notes:</span><span>____________________________________________</span></div>
+      </section>
+    ))}
+    <section class="print-section">
+      <h2>Home access notes</h2>
+      <div class="print-check"><span>Trusted access plan:</span><span>____________________________________________</span></div>
+      <div class="print-check"><span>Important notes:</span><span>____________________________________________</span></div>
+    </section>
+    <div class="button-row">
+      <button class="button primary" onclick="window.print()">Print this sheet</button>
+      <a class="button secondary" href="/guides/family-caregiver-binder-what-to-include/">Read the binder guide</a>
+    </div>
+  </article>
+</BaseLayout>
